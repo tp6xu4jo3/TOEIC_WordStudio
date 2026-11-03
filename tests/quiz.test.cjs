@@ -20,6 +20,33 @@ test('母字分組無遺漏、無重覆、子項都在詞庫內；qualify 類別
  assert.ok(!groups.find(x=>x.head==='apply').entries.some(x=>x.en==='appliance'));
  for(const spec of familyDefs)for(const child of [...spec.forms,...spec.preps,...spec.uses])assert.ok(words.some(w=>w.en===child),'群組出現題庫外項目：'+child);
 });
+test('字典預設DAY及原書順序，字族不得移動或合併任何原始詞條',()=>{
+ const families=E.makeFamilies(words,familyDefs);
+ const sourceIds=words.map(w=>w.id);
+ const ordered=E.bookSequence(words);
+ assert.equal(ordered.map(w=>w.id).join(','),sourceIds.join(','),'資料來源應已依教材排列');
+ const runs=E.bookRuns(words,families,{},'');
+ const flattened=runs.flatMap(r=>r.shown);
+ assert.equal(flattened.length,words.length);
+ assert.equal(flattened.map(w=>w.id).join(','),sourceIds.join(','),'字族分段不能改變原始詞條順序');
+ assert.equal(new Set(flattened.map(w=>w.id)).size,words.length);
+ assert.equal(runs.filter(r=>r.dayStart).map(r=>r.day).join(','),'1,2,3,4');
+ for(const day of [1,2,3,4]){
+  const entries=flattened.filter(w=>w.day===day);
+  assert.ok(entries.length>0);
+  assert.equal(entries.map(w=>w.bookNo).join(','),entries.map((w,i)=>i+1).join(','));
+ }
+ assert.equal(flattened[0].en,'resume');
+ assert.equal(flattened.filter(w=>w.day===2)[0].en,'attire');
+ assert.equal(flattened.filter(w=>w.day===3)[0].en,'accustomed');
+ assert.equal(flattened.filter(w=>w.day===4)[0].en,'lax');
+ const subset=E.bookRuns(words,families,{day:'3',level:'800'},'').flatMap(r=>r.shown);
+ assert.equal(subset.map(w=>w.id).join(','),words.filter(w=>w.day===3&&w.level==='800').map(w=>w.id).join(','));
+ const search=E.bookRuns(words,families,{},'qualif').flatMap(r=>r.shown);
+ const positions=new Map(words.map((w,i)=>[w.id,i]));
+ assert.ok(search.length>4);
+ assert.ok(search.every((w,i)=>i===0||positions.get(w.id)>positions.get(search[i-1].id)));
+});
 test('搭配題都是單一空格、正確答案存在、選項無重複、考點屬於詞庫',()=>{
  assert.ok(grammar.length>=40);
  const names=new Set(words.map(w=>w.en));

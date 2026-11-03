@@ -72,3 +72,8 @@
 .tree-entry .unfamiliar-star.active{color:var(--coral);background:#fff0e7;border-color:#eec3b6}
 .tree-entry .unfamiliar-star:focus-visible{outline:3px solid #8daea1;outline-offset:2px}
 @media(max-width:600px){.family-grid{grid-template-columns:minmax(0,1fr)}.family-caption{padding:9px 12px;gap:7px}.family-tree{padding:6px 10px 10px}.tree-entry{padding-left:9px}.tree-entry.depth-1{margin-left:16px;padding-left:11px}.tree-entry.depth-1:before{width:9px;top:26px}.tree-entry.depth-1:last-child:after{height:26px}.tree-word{font-size:19px}.tree-example{padding:9px 10px}.tree-example p{font-size:12px}.tree-entry-content{padding-block:13px}.tree-wordline{gap:3px 7px}.tree-pos,.tree-relation{font-size:9px}.tree-entry .unfamiliar-star{flex-basis:42px;width:42px;min-height:42px}}
+
+/* DAY分段與教材順序索引：字族可分段，但單字仍沿原書的上下順序顯示。 */
+.day-divider{display:flex;align-items:center;gap:14px;margin:20px 0 2px;padding:14px 4px 10px;border-bottom:2px solid #cad3c7;color:#233e32;font-size:20px;font-weight:760;letter-spacing:.6px}
+.day-divider small{font-size:10px;letter-spacing:1px;font-weight:700;color:#8c9c8e}
+@media(max-width:600px){.day-divider{font-size:18px;padding-top:12px}.day-divider small{font-size:9px}}

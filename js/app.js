@@ -11,31 +11,21 @@ const dayValues=[...new Set(WORDS.map(w=>w.day))].sort((a,b)=>a-b);
 const cleanType=t=>t==='搭配／句型'?'搭配／句型':t;
 const mergeMeanings=values=>[...new Set(values.flatMap(v=>String(v).split(/[；;]/).map(t=>t.trim()).filter(Boolean)))].join('；');
 const relevant=(w,search)=>!search||[w.en,w.zh,w.pos,w.note].some(s=>E.norm(s).includes(search));
-function selectedGroups(){const search=E.norm(state.search);return groups.map(g=>({g,shown:g.entries.filter(e=>E.match(e,state.d)&&(!search||relevant(e,search)||E.norm(g.head).includes(search)))})).filter(x=>x.shown.length);}
-function compactEntries(entries){
- const results=[],seen=new Map();
- for(const e of entries){
-  const key=Prefs.wordKey(e);let item=seen.get(key);
-  if(item){item.rows.push(e.id);item.meanings.push(e.zh);item.days.push(e.day);item.levels.push(e.level);item.notes.push(e.note);item.unfamiliar ||= e.unfamiliar;}
-  else{item={...e,rows:[e.id],meanings:[e.zh],days:[e.day],levels:[e.level],notes:[e.note]};seen.set(key,item);results.push(item);}
- }
- return results.map(x=>({...x,zh:mergeMeanings(x.meanings),days:[...new Set(x.days)],levels:[...new Set(x.levels)],note:[...new Set(x.notes.filter(Boolean))].join('；')}));
-}
+function selectedGroups(){return E.bookRuns(WORDS,groups,state.d,state.search);}
 const relationLabels={root:'母字／同字',forms:'衍生字',preps:'介系詞／句型',uses:'搭配／片語'};
 function treeEntry(e,relation,child){
  const marked=Boolean(e.unfamiliar),example=EXAMPLES[E.norm(e.en)];
  const text=example?`<div class="tree-example"><p lang="en">${esc(example[0])}</p>${example[1]?`<p class="tree-example-zh">${esc(example[1])}</p>`:''}</div>`:'';
- return `<div class="tree-entry ${child?'depth-1':'depth-0'} relation-${relation} ${marked?'is-unfamiliar':''}" role="listitem"><div class="tree-entry-content"><div class="tree-entry-top"><div class="tree-wordline"><span class="tree-word" lang="en">${esc(e.en)}</span><span class="tree-pos">${esc(e.pos)}</span><span class="tree-relation">${relationLabels[relation]}</span></div><button type="button" class="unfamiliar-star ${marked?'active':''}" data-toggle-entry="${e.id}" aria-pressed="${marked}" aria-label="${marked?'取消':'標記'}${esc(e.en)}不熟" title="${marked?'取消不熟標記':'加入不熟清單'}">${marked?'★':'☆'}</button></div><p class="tree-meaning">${esc(e.zh)}</p>${text}${e.note?`<p class="tree-note">${esc(e.note)}</p>`:''}<div class="tree-meta">${e.days.map(day=>'DAY '+day).join(' · ')} <span aria-hidden="true">/</span> ${e.levels.map(esc).join(' · ')} <span aria-hidden="true">/</span> ${esc(e.type)}${e.rows.length>1?' · 合併'+e.rows.length+'筆':''}</div></div></div>`;
+ return `<div data-entry-id="${e.id}" data-book-no="${e.bookNo}" class="tree-entry ${child?'depth-1':'depth-0'} relation-${relation} ${marked?'is-unfamiliar':''}" role="listitem"><div class="tree-entry-content"><div class="tree-entry-top"><div class="tree-wordline"><span class="tree-word" lang="en">${esc(e.en)}</span><span class="tree-pos">${esc(e.pos)}</span><span class="tree-relation">${relationLabels[relation]}</span></div><button type="button" class="unfamiliar-star ${marked?'active':''}" data-toggle-entry="${e.id}" aria-pressed="${marked}" aria-label="${marked?'取消':'標記'}${esc(e.en)}不熟" title="${marked?'取消不熟標記':'加入不熟清單'}">${marked?'★':'☆'}</button></div><p class="tree-meaning">${esc(e.zh)}</p>${text}${e.note?`<p class="tree-note">${esc(e.note)}</p>`:''}<div class="tree-meta">DAY ${e.day} · NO. ${String(e.bookNo).padStart(3,'0')} <span aria-hidden="true">/</span> ${e.levels.map(esc).join(' · ')} <span aria-hidden="true">/</span> ${esc(e.type)}${e.rows.length>1?' · 合併'+e.rows.length+'筆':''}</div></div></div>`;
 }
-function familyHTML({g,shown},i){
- const ordered=[...shown].sort((a,b)=>['root','forms','preps','uses'].indexOf(a.relation)-['root','forms','preps','uses'].indexOf(b.relation));
- const entries=compactEntries(ordered);const grouped=entries.length>1;
- // 保留搜尋／篩選結果，只把實際符合條件的詞條寫進第一層。
- return `<section class="family-card ${grouped?'has-branches':'single-entry'}" aria-label="${esc(g.head)}字族"><header class="family-caption"><span class="family-caption-id">${String(i+1).padStart(2,'0')} / ${grouped?'WORD FAMILY':'WORD ENTRY'}</span><span class="family-caption-name">${esc(g.head)}</span><span class="family-caption-count">${entries.length} ${entries.length===1?'ENTRY':'ENTRIES'}</span></header><div class="family-tree" role="list">${entries.map(e=>treeEntry(e,e.relation,grouped&&e.relation!=='root')).join('')}</div></section>`;
+function familyHTML({g,shown,day,dayStart},i){
+ const entries=shown,grouped=entries.length>1;
+ const dayHeader=dayStart?`<div class="day-divider" role="heading" aria-level="3"><span>DAY ${String(day).padStart(2,'0')}</span><small>ORIGINAL ORDER / ${day===1||day===2?'SHEET':'DAY VOCABULARY'}</small></div>`:'';
+ return `${dayHeader}<section class="family-card ${grouped?'has-branches':'single-entry'}" aria-label="${esc(g.head)}字族"><header class="family-caption"><span class="family-caption-id">${String(i+1).padStart(2,'0')} / DAY ${day}</span><span class="family-caption-name">${esc(g.head)}</span><span class="family-caption-count">${entries.length} ${entries.length===1?'ENTRY':'ENTRIES'}</span></header><div class="family-tree" role="list">${entries.map(e=>treeEntry(e,e.relation,e.relation!=='root')).join('')}</div></section>`;
 }
-function renderDictionary(){const set=selectedGroups();$('#allCount').textContent=WORDS.length;$('#familyCount').textContent=groups.length;$('#dictResultCount').textContent=`${set.length} 個字族 · ${set.reduce((n,x)=>n+x.shown.length,0)} 筆符合 · ★ ${WORDS.filter(w=>w.unfamiliar).length} 不熟`;
+function renderDictionary(){const set=selectedGroups();$('#allCount').textContent=WORDS.length;$('#familyCount').textContent=groups.length;$('#dictResultCount').textContent=`依DAY與原書順序 · ${set.reduce((n,x)=>n+x.shown.length,0)} 筆符合 · ★ ${WORDS.filter(w=>w.unfamiliar).length} 不熟`;
  $('#familyGrid').innerHTML=set.length?set.slice(0,state.limit).map(familyHTML).join(''):`<div class="empty"><b>No matches found.</b>目前的條件沒有符合的詞條。試著調整DAY、類型或搜尋字詞。</div>`;
- $('#loadMore').hidden=set.length<=state.limit;if(set.length>state.limit)$('#loadMore').innerHTML=`向下捲動，自動載入更多字族 <span>↓</span> (${state.limit}/${set.length})`;
+ $('#loadMore').hidden=set.length<=state.limit;if(set.length>state.limit)$('#loadMore').innerHTML=`向下捲動，自動載入更多詞條 <span>↓</span> (${state.limit}/${set.length})`;
 }
 function toggleUnfamiliar(id){const word=byId.get(id);if(!word)return;
  const key=Prefs.wordKey(word),next=!preferences.isMarked(word);

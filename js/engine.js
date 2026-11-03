@@ -20,6 +20,37 @@ function makeFamilies(words,definitions){
  groups.sort((a,b)=>a.head.localeCompare(b.head,'en'));
  return groups;
 }
+// 字典只依DAY與原始詞條位置排序。字族標籤僅輔助顯示，不改變教材順序。
+function bookSequence(words){
+ return words.map((word,index)=>({word,index})).sort((a,b)=>{
+  const day=Number(a.word.day)-Number(b.word.day);if(day)return day;
+  const hasRow=w=>w.row!==null&&w.row!==undefined&&Number.isFinite(Number(w.row));
+  if(hasRow(a.word)&&hasRow(b.word)){
+   const diff=Number(a.word.row)-Number(b.word.row);if(diff)return diff;
+  }
+  return a.index-b.index;
+ }).map(item=>item.word);
+}
+function bookRuns(words,families,filter={},search=''){
+ const membership=new Map();
+ for(const family of families)for(const item of family.entries){
+  membership.set(item.id,{family,relation:item.relation});
+ }
+ const terms=norm(search),runs=[],dayCounts=new Map();
+ for(const word of bookSequence(words)){
+  const day=Number(word.day),bookNo=(dayCounts.get(day)||0)+1;
+  dayCounts.set(day,bookNo);
+  const info=membership.get(word.id);
+  const family=info?.family||{id:'entry:'+word.id,head:word.en,entries:[word]};
+  if(!match(word,filter))continue;
+  if(terms&&![word.en,word.zh,word.pos,word.note,family.head].some(v=>norm(v).includes(terms)))continue;
+  const entry={...word,relation:info?.relation||'root',bookNo,rows:[word.id],days:[day],levels:[word.level]};
+  const last=runs[runs.length-1];
+  if(last&&last.day===day&&last.g.id===family.id){last.shown.push(entry);}
+  else runs.push({g:family,day,shown:[entry],dayStart:!last||last.day!==day});
+ }
+ return runs;
+}
 function chooseFoils(words,correct,mode,count=3){
  const choices=shuffle(words.filter(x=>norm(x.en)!==norm(correct.en)&&!overlap(x.zh,correct.zh)&&x.zh!==correct.zh))
  .map(w=>({w,score:(posHead(w.pos)===posHead(correct.pos)?7:0)+(w.type===correct.type?3:0)+(w.level===correct.level?1:0)+Math.random()*3}))
@@ -69,5 +100,5 @@ function availableCount(words,grammar,synonyms,filter,mode){
  if(mode==='syn'){const names=new Set(pool(words,filter).map(w=>norm(w.en)));return synonyms.filter(g=>g.answers.filter(x=>names.has(norm(x))).length>=2).length;}
  return pool(words,filter).length;
 }
-global.WordEngine={norm,shuffle,overlap,match,pool,makeFamilies,buildWordQ,buildSynQ,buildGrammarQ,availableCount};
+global.WordEngine={norm,shuffle,overlap,match,pool,makeFamilies,bookSequence,bookRuns,buildWordQ,buildSynQ,buildGrammarQ,availableCount};
 })(typeof window!=='undefined'?window:globalThis);
