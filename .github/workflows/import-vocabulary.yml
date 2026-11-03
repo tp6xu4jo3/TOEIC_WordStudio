@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - scripts/import_lingoland.py
+      - js/engine.js
       - .github/workflows/import-vocabulary.yml
   workflow_dispatch:
 permissions:

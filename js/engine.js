@@ -57,7 +57,7 @@ function buildGrammarQ(words,items,filter,recent=[]){
  const eligible=items.map((p,i)=>({...p,index:i})).filter(p=>available.has(norm(p.source)));
  if(!eligible.length)return null;
  const fresh=eligible.filter(p=>!recent.includes(p.source));const item=pick(fresh.length?fresh:eligible);
- const origin=words.find(w=>norm(w.en)===norm(item.source));
+ const origin=pool(words,filter).find(w=>norm(w.en)===norm(item.source));
  const options=shuffle(item.choices).map(text=>({text,correct:text===item.answer}));
  return {mode:'grammar',source:item.source,sourceKey:item.source,answer:origin,
   kind:item.kind,clue:origin?.zh||'完成固定搭配',prompt:item.frame,
