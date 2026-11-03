@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..'),ctx={window:{},Math,console};
-for(const file of ['data/words.js','data/families.js','data/grammar.js','data/synonyms.js','js/engine.js'])vm.runInNewContext(fs.readFileSync(path.join(root,file),'utf8'),ctx,{filename:file});
+for(const file of ['data/words.js','data/families.js','data/grammar.js','data/synonyms.js','js/preferences.js','js/engine.js'])vm.runInNewContext(fs.readFileSync(path.join(root,file),'utf8'),ctx,{filename:file});
 const {WORDSTUDIO_WORDS:words,WORDSTUDIO_FAMILIES:familyDefs,WORDSTUDIO_GRAMMAR:grammar,WORDSTUDIO_SYNONYMS:synonyms,WordEngine:E}=ctx.window;
 test('詞條與分類符合題庫；保留重複詞性與DAY',()=>{
  assert.equal(words.length,487);assert.equal(words.filter(w=>w.day===1).length,246);assert.equal(words.filter(w=>w.day===2).length,241);
@@ -47,4 +47,28 @@ test('筛選後未符合的文法與字詞不出題',()=>{
    if(q)assert.equal(q.answer.day,d);
   }
  }}
+});
+
+test('可手動標記不熟、取消標記、重新載入保留，只儲存與原表不同的設定',()=>{
+ const original=words.map(w=>({...w})), data=new Map();
+ const storage={getItem:key=>data.get(key)||null,setItem:(key,value)=>data.set(key,value)};
+ const Pref=ctx.window.WordStudioPreferences, model=Pref.create(original,storage);
+ const word=original.find(w=>w.en==='qualify'); assert.ok(word);
+ const before=model.isMarked(word),desired=!before;
+ assert.equal(model.setMarked(word,desired),true);
+ assert.equal(model.isMarked(word),desired);
+ assert.equal(JSON.parse(data.get(model.storageKey))[Pref.wordKey(word)],desired);
+ const cloned=words.map(w=>({...w})),reloaded=Pref.create(cloned,storage);
+ assert.equal(reloaded.isMarked(cloned.find(w=>w.en==='qualify')),desired);
+ assert.equal(E.pool(cloned,{unfamiliar:true}).some(w=>w.en==='qualify'),desired);
+ assert.equal(reloaded.setMarked(cloned.find(w=>w.en==='qualify'),before),true);
+ assert.equal(Object.hasOwn(JSON.parse(data.get(model.storageKey)),Pref.wordKey(word)),false);
+});
+test('相同詞條與詞性下的多筆重複資料會一起更新不熟狀態',()=>{
+ const duplicate=words.map(w=>({...w})), Pref=ctx.window.WordStudioPreferences;
+ const by=new Map();for(const w of duplicate){const key=Pref.wordKey(w);by.set(key,(by.get(key)||[]).concat(w));}
+ const found=[...by.values()].find(x=>x.length>1);assert.ok(found,'題庫含同英文與詞性的重複列');
+ const model=Pref.create(duplicate,null);model.setMarked(found[0],true);
+ assert.ok(found.every(x=>x.unfamiliar===true));model.setMarked(found[0],false);
+ assert.ok(found.every(x=>x.unfamiliar===false));
 });

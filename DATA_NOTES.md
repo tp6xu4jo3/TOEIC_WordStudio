@@ -30,3 +30,18 @@
 - 搭配／文法題為經人工選定的規則，僅當題庫詞條和目前DAY／難度／類型條件吻合才出題。
 - 介系詞、句型的干擾選項由人工編輯，程式再檢查答案是否唯一標記、選項是否重複；**程式無法自動證明所有英文自然語境只有一個合理答案**，後續新增題目仍應人工審核。
 - 完全沒有自動加減出題次數、答錯次數、題庫同步、語音或持久作答紀錄。
+- 2026-11-04起允許使用者在字典手動修改「不熟」；只將差異儲存在該瀏覽器本機`localStorage`，不寫回Google Sheets、不跨裝置同步，也不保存作答歷史。
+
+## 2026-11-04：Day3、Day4外部資料完整性查核（未匯入）
+
+本網站Day1／Day2的487筆，包含核心詞彙與基礎、800、900分級、字形變化、例示搭配、介系詞與片語。新Day若加入必須可驗證同教材版本、各級別均完整，而不只是某位使用者整理的核心卡片。
+
+已辨識的參考來源如下：
+
+- 官方出版社的[Hackers TOEIC Vocabulary書目](https://www.hackerseducation.com/publications/detail?BookID=40&LevelID=53&TestID=22)確認本書有7,600詞與片語及分級內容，但未提供可逐項校驗的Day3/Day4完整列表。
+- [Studocu：Day3辦公室工作(1)摘錄](https://www.studocu.vn/vn/document/long-an-university-of-economics-and-industry/tieng-anh-chuyen-nganh/hackers-toeic-vocabulary-office-work-insights-and-preparation/138832712)及[後段分級詞彙摘錄](https://www.studocu.vn/vn/document/hutech-university-of-technology/teaching-for-young-learner/day-30-vocabulary-for-toeic-office-work-preparation/165165600)有可辨識部分頁面，但未取得與現有題庫欄位逐列核對、清楚授權重製的完整資料集。
+- [Quizlet：Day3（110張）](https://quizlet.com/vn/861241946/hacker-toeic-vocab-day-3-flash-cards/)與[另一套Day3（88張）](https://quizlet.com/vn/1151303946/hacker-toeic-vocabulary-day-3-flash-cards/)張數不同；無從確認哪個完整包含所有分級與搭配。
+- [Quizlet：Day4（195張）](https://quizlet.com/vn/1195264991/hacker-toeic-vocab-day-4-flash-cards/)與[另一套Day4（81張）](https://quizlet.com/vn/765628933/hacker-toeic-vocabulary-day-4-da-sua-flash-cards/)內容範圍不同，也無法當作完整權威清單。
+- [越南版授權資訊](https://www.studocu.vn/vn/document/truong-dai-hoc-fpt/toeic/hackers-toeic-vocab-doc-thu-5d2934da66264395-bc1ccbdd-88f72bc8/69031996)有明確保留重製權利；公開可讀不能直接等同可以把整份編纂的清單重製到公開Repository。
+
+結論：**未驗證到可安全完整匯入的Day3、Day4資料，這兩天皆未添加**。保留Google Drive來源Day1、Day2全部487筆，沒有拿其他網站的片段補齊、推測中文、編造難度或將外部詞表冒充原題庫。若未來有獲授權、完整的使用者教材或本人的Day3/Day4 Sheet，再依來源匯入並校對。
