@@ -20,12 +20,12 @@ function treeEntry(e,relation,child){
 }
 function familyHTML({g,shown,day,dayStart},i){
  const entries=shown,grouped=entries.length>1;
- const dayHeader=dayStart?`<div class="day-divider" role="heading" aria-level="3"><span>DAY ${String(day).padStart(2,'0')}</span><small>BOOK ORDER</small></div>`:'';
+ const dayHeader=dayStart?`<div class="day-divider" role="heading" aria-level="3"><span>DAY ${String(day).padStart(2,'0')}</span><small>WORD FAMILIES</small></div>`:'';
  return `${dayHeader}<section class="family-card ${grouped?'has-branches':'single-entry'}" aria-label="${esc(g.head)}字族"><header class="family-caption"><span class="family-caption-id">${String(i+1).padStart(2,'0')} / DAY ${day}</span><span class="family-caption-name">${esc(g.head)}</span><span class="family-caption-count">${entries.length} ${entries.length===1?'ENTRY':'ENTRIES'}</span></header><div class="family-tree" role="list">${entries.map(e=>treeEntry(e,e.relation,e.relation!=='root')).join('')}</div></section>`;
 }
-function renderDictionary(){const set=selectedGroups();$('#allCount').textContent=WORDS.length;$('#familyCount').textContent=groups.length;$('#dictResultCount').textContent=`依DAY與原書順序 · ${set.reduce((n,x)=>n+x.shown.length,0)} 筆符合 · ★ ${WORDS.filter(w=>w.unfamiliar).length} 不熟`;
+function renderDictionary(){const set=selectedGroups();$('#allCount').textContent=WORDS.length;$('#familyCount').textContent=groups.length;$('#dictResultCount').textContent=`字族相連 · 母字優先 · ${set.reduce((n,x)=>n+x.shown.length,0)} 筆符合 · ★ ${WORDS.filter(w=>w.unfamiliar).length} 不熟`;
  $('#familyGrid').innerHTML=set.length?set.slice(0,state.limit).map(familyHTML).join(''):`<div class="empty"><b>No matches found.</b>目前的條件沒有符合的詞條。試著調整DAY、類型或搜尋字詞。</div>`;
- $('#loadMore').hidden=set.length<=state.limit;if(set.length>state.limit)$('#loadMore').innerHTML=`向下捲動，自動載入更多詞條 <span>↓</span> (${state.limit}/${set.length})`;
+ $('#loadMore').hidden=set.length<=state.limit;if(set.length>state.limit)$('#loadMore').innerHTML=`向下捲動，自動載入更多字族 <span>↓</span> (${state.limit}/${set.length})`;
 }
 function toggleUnfamiliar(id){const word=byId.get(id);if(!word)return;
  const key=Prefs.wordKey(word),next=!preferences.isMarked(word);

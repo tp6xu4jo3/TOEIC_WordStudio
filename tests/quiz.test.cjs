@@ -20,32 +20,37 @@ test('母字分組無遺漏、無重覆、子項都在詞庫內；qualify 類別
  assert.ok(!groups.find(x=>x.head==='apply').entries.some(x=>x.en==='appliance'));
  for(const spec of familyDefs)for(const child of [...spec.forms,...spec.preps,...spec.uses])assert.ok(words.some(w=>w.en===child),'群組出現題庫外項目：'+child);
 });
-test('字典預設DAY及原書順序，字族不得移動或合併任何原始詞條',()=>{
- const families=E.makeFamilies(words,familyDefs);
- const sourceIds=words.map(w=>w.id);
- const ordered=E.bookSequence(words);
- assert.equal(ordered.map(w=>w.id).join(','),sourceIds.join(','),'資料來源應已依教材排列');
- const runs=E.bookRuns(words,families,{},'');
- const flattened=runs.flatMap(r=>r.shown);
- assert.equal(flattened.length,words.length);
- assert.equal(flattened.map(w=>w.id).join(','),sourceIds.join(','),'字族分段不能改變原始詞條順序');
- assert.equal(new Set(flattened.map(w=>w.id)).size,words.length);
- assert.equal(runs.filter(r=>r.dayStart).map(r=>r.day).join(','),'1,2,3,4');
- for(const day of [1,2,3,4]){
-  const entries=flattened.filter(w=>w.day===day);
-  assert.ok(entries.length>0);
-  assert.equal(entries.map(w=>w.bookNo).join(','),entries.map((w,i)=>i+1).join(','));
+test('母字與子字強制相連且母字永遠最前；字族按首次出現位置排序',()=>{
+ const families=E.makeFamilies(words,familyDefs),runs=E.bookRuns(words,families,{},'');
+ const seen=runs.flatMap(r=>r.shown.map(w=>w.id));
+ assert.equal(seen.length,words.length);
+ assert.equal(new Set(seen).size,words.length);
+ assert.equal(runs.length,families.length,'每個字族只能顯示一次');
+ assert.ok(runs.every((r,i)=>i===0||r.anchor>runs[i-1].anchor),'字族順序須依最早出現位置');
+ assert.equal(runs[0].shown[0].en,'resume');
+ for(const r of runs){
+  const rootCount=r.shown.filter(x=>x.relation==='root').length;
+  assert.ok(r.shown.slice(0,rootCount).every(x=>x.relation==='root'),r.g.head);
+  assert.ok(r.shown.slice(rootCount).every(x=>x.relation!=='root'),r.g.head);
+  assert.equal(r.anchor,Math.min(...r.g.entries.map(x=>words.findIndex(w=>w.id===x.id))));
  }
- assert.equal(flattened[0].en,'resume');
- assert.equal(flattened.filter(w=>w.day===2)[0].en,'attire');
- assert.equal(flattened.filter(w=>w.day===3)[0].en,'accustomed');
- assert.equal(flattened.filter(w=>w.day===4)[0].en,'lax');
- const subset=E.bookRuns(words,families,{day:'3',level:'800'},'').flatMap(r=>r.shown);
- assert.equal(subset.map(w=>w.id).join(','),words.filter(w=>w.day===3&&w.level==='800').map(w=>w.id).join(','));
- const search=E.bookRuns(words,families,{},'qualif').flatMap(r=>r.shown);
- const positions=new Map(words.map((w,i)=>[w.id,i]));
- assert.ok(search.length>4);
- assert.ok(search.every((w,i)=>i===0||positions.get(w.id)>positions.get(search[i-1].id)));
+ const qualify=runs.find(r=>r.g.head==='qualify');assert.ok(qualify);
+ assert.equal(qualify.shown[0].en,'qualify');
+ for(const term of ['qualified','qualification','qualifier','be qualified for','qualification for'])
+  assert.ok(qualify.shown.some(x=>x.en===term));
+ const searched=E.bookRuns(words,families,{},'qualification');
+ const group=searched.find(r=>r.g.head==='qualify');
+ assert.ok(group);assert.equal(group.shown[0].en,'qualify');
+ assert.ok(group.shown.some(x=>x.en==='qualified'));
+ for(const day of [1,2,3,4]){
+  const filtered=E.bookRuns(words,families,{day:String(day)},'');
+  assert.ok(filtered.length>0);
+  assert.ok(filtered.flatMap(r=>r.shown).every(w=>w.day===day));
+  assert.equal(filtered.flatMap(r=>r.shown).length,words.filter(w=>w.day===day).length);
+  assert.ok(filtered.every((r,i)=>i===0||r.anchor>filtered[i-1].anchor));
+ }
+ const unfamiliar=E.bookRuns(words,families,{unfamiliar:true},'');
+ assert.ok(unfamiliar.flatMap(r=>r.shown).every(x=>x.unfamiliar));
 });
 test('搭配題都是單一空格、正確答案存在、選項無重複、考點屬於詞庫',()=>{
  assert.ok(grammar.length>=40);

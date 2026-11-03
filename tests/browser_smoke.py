@@ -25,17 +25,16 @@ with sync_playwright() as p:
  page.set_content(html,wait_until="load")
  page.wait_for_selector('.family-card')
  assert page.locator('.family-card').count()==18
- # 初始瀏覽順序必須與教材吻合；不因字族／詞性而重新排列。
- initial_words=page.locator('.tree-word').all_inner_texts()
- assert initial_words[:6]==['resume','opening','vacancy','applicant','apply','application'],initial_words[:6]
- initial_order=[int(v) for v in page.locator('.tree-entry').evaluate_all('(nodes)=>nodes.map(n=>n.dataset.bookNo)')]
- assert initial_order==sorted(initial_order) and len(set(initial_order))==len(initial_order)
- if page.locator('#allCount').inner_text()=='824':
-  page.locator('#dDay').select_option('3')
-  assert page.locator('.tree-word').first.inner_text()=='accustomed'
-  page.locator('#dDay').select_option('4')
-  assert page.locator('.tree-word').first.inner_text()=='lax'
-  page.locator('#dDay').select_option('all')
+ # 搜尋子字時，母字仍在首位，整個字族不拆開。
+ first=page.locator('.family-card').first
+ assert first.locator('.tree-word').first.inner_text()=='resume'
+ page.locator('#dictSearch').fill('qualification')
+ group=page.locator('.family-card').filter(has=page.locator('.family-caption-name:text-is("qualify")'))
+ assert group.count()==1
+ assert group.locator('.tree-word').first.inner_text()=='qualify'
+ for term in ['qualified','qualification','qualifier','be qualified for','qualification for']:
+  assert group.locator('.tree-word',has_text=term).count()>=1,term
+ page.locator('#dictSearch').fill('')
  page.locator('#loadMore').scroll_into_view_if_needed()
  page.wait_for_function("document.querySelectorAll('.family-card').length > 18",timeout=4000)
  assert page.locator('.family-card').count()>18

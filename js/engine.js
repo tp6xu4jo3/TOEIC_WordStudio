@@ -20,7 +20,7 @@ function makeFamilies(words,definitions){
  groups.sort((a,b)=>a.head.localeCompare(b.head,'en'));
  return groups;
 }
-// 字典只依DAY與原始詞條位置排序。字族標籤僅輔助顯示，不改變教材順序。
+// 保留原始詞條索引，作為字族首次出現位置與個別詞條編號。
 function bookSequence(words){
  return words.map((word,index)=>({word,index})).sort((a,b)=>{
   const day=Number(a.word.day)-Number(b.word.day);if(day)return day;
@@ -31,25 +31,32 @@ function bookSequence(words){
   return a.index-b.index;
  }).map(item=>item.word);
 }
+// 按字族在教材中首次出現的位置排序，同族相連且母字在最前。
 function bookRuns(words,families,filter={},search=''){
- const membership=new Map();
- for(const family of families)for(const item of family.entries){
-  membership.set(item.id,{family,relation:item.relation});
+ const ordered=bookSequence(words),positions=new Map(),ordinals=new Map(),dayCounts=new Map();
+ for(const [index,word] of ordered.entries()){
+  positions.set(word.id,index);
+  const day=Number(word.day),ordinal=(dayCounts.get(day)||0)+1;
+  dayCounts.set(day,ordinal);ordinals.set(word.id,ordinal);
  }
- const terms=norm(search),runs=[],dayCounts=new Map();
- for(const word of bookSequence(words)){
-  const day=Number(word.day),bookNo=(dayCounts.get(day)||0)+1;
-  dayCounts.set(day,bookNo);
-  const info=membership.get(word.id);
-  const family=info?.family||{id:'entry:'+word.id,head:word.en,entries:[word]};
-  if(!match(word,filter))continue;
-  if(terms&&![word.en,word.zh,word.pos,word.note,family.head].some(v=>norm(v).includes(terms)))continue;
-  const entry={...word,relation:info?.relation||'root',bookNo,rows:[word.id],days:[day],levels:[word.level]};
-  const last=runs[runs.length-1];
-  if(last&&last.day===day&&last.g.id===family.id){last.shown.push(entry);}
-  else runs.push({g:family,day,shown:[entry],dayStart:!last||last.day!==day});
+ const relationRank={root:0,forms:1,preps:2,uses:3},terms=norm(search);
+ const result=[];
+ for(const family of families){
+  const eligible=family.entries.filter(word=>match(word,filter));
+  if(!eligible.length)continue;
+  if(terms&&!norm(family.head).includes(terms)&&!eligible.some(word=>
+   [word.en,word.zh,word.pos,word.note].some(value=>norm(value).includes(terms))))continue;
+  const first=eligible.reduce((a,b)=>positions.get(a.id)<positions.get(b.id)?a:b);
+  const shown=eligible.sort((a,b)=>{
+   const rank=(relationRank[a.relation]??4)-(relationRank[b.relation]??4);
+   return rank||positions.get(a.id)-positions.get(b.id);
+  }).map(word=>({...word,bookNo:ordinals.get(word.id),rows:[word.id],
+   days:[word.day],levels:[word.level]}));
+  result.push({g:family,shown,day:Number(first.day),anchor:positions.get(first.id)});
  }
- return runs;
+ result.sort((a,b)=>a.anchor-b.anchor);
+ for(let i=0;i<result.length;i++)result[i].dayStart=i===0||result[i-1].day!==result[i].day;
+ return result;
 }
 function chooseFoils(words,correct,mode,count=3){
  const choices=shuffle(words.filter(x=>norm(x.en)!==norm(correct.en)&&!overlap(x.zh,correct.zh)&&x.zh!==correct.zh))
