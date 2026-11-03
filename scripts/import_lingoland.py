@@ -94,12 +94,14 @@ def page_entries(data, url):
             if line in ('範例:', '示例:', 'Example:'):
                 example = i + 1 < len(segment) and bool(ASCII.search(segment[i+1]))
                 break
-            match = POS_RE.match(line)
+            match = re.match(r'^\(([^)]+)\)\s*(.*)$',line)
             if match:
                 for p in match.group(1).lower().split(';'):
                     p = p.strip()
                     posparts.append(POS_CN.get(p, p))
                 meanings = match.group(2).strip().strip(';')
+                if not meanings and i+1<len(segment) and not segment[i+1].startswith('('):
+                    meanings=segment[i+1].strip().strip(';')
                 if meanings:glosses.append(meanings)
         if not posparts:  # Rows with no lexical POS/gloss need review, not silent guessing.
             continue
