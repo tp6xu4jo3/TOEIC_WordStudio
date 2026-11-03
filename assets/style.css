@@ -30,3 +30,45 @@
 .detail-example p[lang="en"]{font:400 19px/1.6 var(--serif);margin:15px 0 7px;color:#253b34}
 .detail-example>span{display:block;font-size:12px;line-height:1.9;color:#75857c}
 @media(max-width:600px){.detail-example{padding:16px}.detail-example p[lang="en"]{font-size:17px}}
+
+
+/* 第一層字族樹：每一個母字、衍生字與搭配都直接閱讀，字級完全一致。 */
+.family-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+.family-card{min-width:0;background:var(--paper);border:1px solid #dbdfd5;border-radius:15px;overflow:hidden;box-shadow:0 7px 24px rgba(28,43,34,.035)}
+.family-card:hover{border-color:#c8d4c9}
+.family-caption{display:flex;align-items:center;gap:10px;min-height:44px;padding:10px 20px;background:#f1f2ea;border-bottom:1px solid #e3e5da;flex-wrap:wrap}
+.family-caption-id{color:#9ba69a;font-size:9px;font-weight:800;letter-spacing:1.15px;white-space:nowrap}
+.family-caption-name{color:#627c6d;font-size:11px;font-weight:650;overflow-wrap:anywhere}
+.family-caption-count{margin-left:auto;color:#9da99d;font-size:9px;font-weight:750;letter-spacing:.65px;white-space:nowrap}
+.family-tree{display:grid;gap:0;padding:10px 19px 13px}
+.tree-entry{position:relative;min-width:0;padding:0 0 0 13px;--edge:#bccbc1}
+.tree-entry+.tree-entry{border-top:1px solid #e8ece4}
+.tree-entry.depth-1{margin-left:29px;border-top:0;padding-left:19px;border-left:1px solid var(--edge)}
+.tree-entry.depth-1:before{position:absolute;content:"";top:27px;left:0;width:15px;border-top:1px solid var(--edge)}
+.tree-entry.depth-1:last-child{border-left-color:transparent}
+.tree-entry.depth-1:last-child:after{position:absolute;content:"";left:-1px;top:0;height:27px;border-left:1px solid var(--edge)}
+.tree-entry.depth-1+.tree-entry.depth-1{border-top:0}
+.tree-entry.depth-0:before{position:absolute;content:"";left:0;top:27px;width:5px;height:5px;border-radius:50%;background:#6e8b79}
+.tree-entry.relation-preps{--edge:#83aa9f}
+.tree-entry.relation-uses{--edge:#dba58e}
+.tree-entry-content{padding:15px 0 16px;min-width:0}
+.tree-entry-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-width:0}
+.tree-wordline{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 12px;min-width:0;padding-top:2px}
+.tree-word{font:500 21px/1.32 var(--serif);letter-spacing:-.35px;color:var(--ink);overflow-wrap:anywhere}
+.tree-pos,.tree-relation{font-size:10px;line-height:1.5;color:#89988d;font-weight:600}
+.tree-relation{color:#8b9b8c;border:1px solid #dde5db;border-radius:99px;padding:1px 7px;white-space:nowrap}
+.tree-entry.relation-preps .tree-relation{color:#597d74;border-color:#c7d9d2}
+.tree-entry.relation-uses .tree-relation{color:#ac735f;border-color:#edd2c6}
+.tree-meaning{font-size:13px;line-height:1.8;margin:2px 0 0;color:#66796d;overflow-wrap:anywhere}
+.tree-example{margin:11px 0 0;padding:10px 13px;border-left:2px solid #d6e0d4;background:#f6f7f1;border-radius:0 8px 8px 0}
+.tree-example p{font-size:13px;line-height:1.65;margin:0;overflow-wrap:anywhere;color:#405a50}
+.tree-example p.tree-example-zh{margin-top:4px;color:#88998d;font-size:12px}
+.tree-note{font-size:11px;line-height:1.7;color:#877963;margin:9px 0 0;overflow-wrap:anywhere}
+.tree-meta{font-size:10px;line-height:1.6;color:#98a499;margin-top:9px;letter-spacing:.2px;overflow-wrap:anywhere}
+.tree-meta span{padding:0 4px;color:#d0d8d0}
+.tree-entry.is-unfamiliar .tree-word{color:#b9624d}
+.tree-entry .unfamiliar-star{flex:0 0 44px;width:44px;min-height:44px;background:#f3f5ef;border:1px solid #e3e8de;border-radius:10px;color:#a4afa5;font-size:22px;cursor:pointer}
+.tree-entry .unfamiliar-star:hover,.tree-entry .unfamiliar-star:focus-visible{color:var(--coral);border-color:#efb2a1;background:#fff4ef}
+.tree-entry .unfamiliar-star.active{color:var(--coral);background:#fff0e7;border-color:#eec3b6}
+.tree-entry .unfamiliar-star:focus-visible{outline:3px solid #8daea1;outline-offset:2px}
+@media(max-width:600px){.family-grid{grid-template-columns:minmax(0,1fr)}.family-caption{padding:9px 12px;gap:7px}.family-tree{padding:6px 10px 10px}.tree-entry{padding-left:9px}.tree-entry.depth-1{margin-left:16px;padding-left:11px}.tree-entry.depth-1:before{width:9px;top:26px}.tree-entry.depth-1:last-child:after{height:26px}.tree-word{font-size:19px}.tree-example{padding:9px 10px}.tree-example p{font-size:12px}.tree-entry-content{padding-block:13px}.tree-wordline{gap:3px 7px}.tree-pos,.tree-relation{font-size:9px}.tree-entry .unfamiliar-star{flex-basis:42px;width:42px;min-height:42px}}

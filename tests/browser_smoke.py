@@ -25,12 +25,32 @@ with sync_playwright() as p:
  page.set_content(html,wait_until="load")
  page.wait_for_selector('.family-card')
  assert page.locator('.family-card').count()==18
+ page.locator('#loadMore').scroll_into_view_if_needed()
+ page.wait_for_function("document.querySelectorAll('.family-card').length > 18",timeout=4000)
+ assert page.locator('.family-card').count()>18
  assert page.locator('#allCount').inner_text() in ('487','824')
  page.locator('#dictSearch').fill('qualif')
  page.wait_for_timeout(100)
  assert page.locator('.family-card').count()>=1
- assert page.locator('.family-card:has-text("qualify") .branch-leaf').count()>=4
+ assert page.locator('.family-card:has-text("qualify") .tree-entry').count()>=4
  assert page.get_by_text('be qualified for',exact=True).count()>=1
+ # 無論母字或子字，例句與資料直接顯示，不依賴展開按鈕或彈窗。
+ assert page.locator('.family-card:has-text("qualify") .tree-entry.depth-0').count()>=1
+ assert page.locator('.family-card:has-text("qualify") .tree-entry.depth-1').count()>=3
+ assert page.locator('.family-card:has-text("qualify") .tree-example p[lang="en"]').count()>=4
+ assert page.locator('.leaf-open,[data-family],#detailDialog').count()==0
+ assert page.locator('.family-tree [hidden]').count()==0
+ assert page.evaluate('''() => {
+   const card=[...document.querySelectorAll('.family-card')].find(c=>c.textContent.includes('qualify'));
+   const root=card.querySelector('.tree-entry.depth-0 .tree-word');
+   const child=card.querySelector('.tree-entry.depth-1 .tree-word');
+   return !!root && !!child && getComputedStyle(root).fontSize===getComputedStyle(child).fontSize;
+ }''')
+ # 單筆詞條也是第一層，無需另開資訊頁。
+ page.locator('#dictSearch').fill('resume')
+ assert page.locator('.tree-entry').count()>=1
+ assert page.locator('.tree-example p[lang="en"]').first.is_visible()
+ page.locator('#dictSearch').fill('qualif')
  page.screenshot(path=str(ROOT.parent/'wordstudio_preview_dictionary.png'),full_page=True)
  page.locator('#dictSearch').fill('')
  page.locator('[data-nav="practice"]').last.click()
@@ -58,15 +78,14 @@ with sync_playwright() as p:
  page.set_content(html,wait_until='load')
  page.locator('#dictSearch').fill('qualify')
  assert page.locator('.unfamiliar-star').first.get_attribute('aria-pressed')==initial
- # Detail and dialog keyboard
- page.locator('[data-nav="dictionary"]').last.click()
+ # 篩選會隱藏不符合的子字；所有符合項目仍直接展開。
  page.locator('#dictSearch').fill('qualify')
- page.locator('.leaf-open').first.click()
- assert page.locator('#detailDialog').evaluate('(d)=>d.open')
- assert page.locator('.detail-title').inner_text().strip()
- assert page.locator('.detail-example p[lang="en"]').inner_text().strip()
- assert page.locator('#detailBody a[href^="http"]').count()==0
- page.locator('.close-dialog').click()
+ page.locator('#dUnfamiliar').check()
+ assert page.locator('.tree-entry').count() >= 0
+ assert page.locator('.family-tree [hidden],.leaf-open,#detailDialog').count()==0
+ page.locator('#dUnfamiliar').uncheck()
+ page.locator('#dictSearch').fill('qualif')
+ assert page.locator('.tree-example p[lang="en"]').count()>=4
  # Mobile
  mobile=browser.new_page(viewport={'width':390,'height':844},device_scale_factor=1)
  mobile.on('pageerror',lambda err: errors.append(str(err)))
