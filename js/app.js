@@ -20,7 +20,7 @@ function treeEntry(e,relation,child){
 }
 function familyHTML({g,shown,day,dayStart},i){
  const entries=shown,grouped=entries.length>1;
- const dayHeader=dayStart?`<div class="day-divider" role="heading" aria-level="3"><span>DAY ${String(day).padStart(2,'0')}</span><small>ORIGINAL ORDER / ${day===1||day===2?'SHEET':'DAY VOCABULARY'}</small></div>`:'';
+ const dayHeader=dayStart?`<div class="day-divider" role="heading" aria-level="3"><span>DAY ${String(day).padStart(2,'0')}</span><small>BOOK ORDER</small></div>`:'';
  return `${dayHeader}<section class="family-card ${grouped?'has-branches':'single-entry'}" aria-label="${esc(g.head)}字族"><header class="family-caption"><span class="family-caption-id">${String(i+1).padStart(2,'0')} / DAY ${day}</span><span class="family-caption-name">${esc(g.head)}</span><span class="family-caption-count">${entries.length} ${entries.length===1?'ENTRY':'ENTRIES'}</span></header><div class="family-tree" role="list">${entries.map(e=>treeEntry(e,e.relation,e.relation!=='root')).join('')}</div></section>`;
 }
 function renderDictionary(){const set=selectedGroups();$('#allCount').textContent=WORDS.length;$('#familyCount').textContent=groups.length;$('#dictResultCount').textContent=`依DAY與原書順序 · ${set.reduce((n,x)=>n+x.shown.length,0)} 筆符合 · ★ ${WORDS.filter(w=>w.unfamiliar).length} 不熟`;
