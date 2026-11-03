@@ -29,7 +29,4 @@
 .example-eyebrow{font-size:10px;font-weight:850;color:#748d7a;letter-spacing:1.2px}
 .detail-example p[lang="en"]{font:400 19px/1.6 var(--serif);margin:15px 0 7px;color:#253b34}
 .detail-example>span{display:block;font-size:12px;line-height:1.9;color:#75857c}
-.detail-example .source-example{font:600 11px/1.7 var(--sans);margin:13px 0 0}
-.detail-example a{color:#357361;text-decoration:underline;text-underline-offset:4px}
-.detail-example .example-placeholder{font:400 12px/1.9 var(--sans);color:#657b6f;margin:11px 0}
 @media(max-width:600px){.detail-example{padding:16px}.detail-example p[lang="en"]{font-size:17px}}

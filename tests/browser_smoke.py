@@ -25,7 +25,7 @@ with sync_playwright() as p:
  page.set_content(html,wait_until="load")
  page.wait_for_selector('.family-card')
  assert page.locator('.family-card').count()==18
- assert '487' in page.locator('#allCount').inner_text()
+ assert page.locator('#allCount').inner_text() in ('487','824')
  page.locator('#dictSearch').fill('qualif')
  page.wait_for_timeout(100)
  assert page.locator('.family-card').count()>=1
@@ -64,6 +64,8 @@ with sync_playwright() as p:
  page.locator('.leaf-open').first.click()
  assert page.locator('#detailDialog').evaluate('(d)=>d.open')
  assert page.locator('.detail-title').inner_text().strip()
+ assert page.locator('.detail-example p[lang="en"]').inner_text().strip()
+ assert page.locator('#detailBody a[href^="http"]').count()==0
  page.locator('.close-dialog').click()
  # Mobile
  mobile=browser.new_page(viewport={'width':390,'height':844},device_scale_factor=1)

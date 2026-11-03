@@ -1,5 +1,4 @@
-/* WORDSTUDIO 自編 TOEIC 職場例句，不是轉載 Lingoland 例句，也不是 ETS 官方真題。
- * 保留外部網站的例句連結供查閱，其餘詞條可陸續人工擴充此字典。 */
+/* 手工撰寫的中英對照職場例句。 */
 (function(){
 'use strict';
 window.WORDSTUDIO_EXAMPLES = {
