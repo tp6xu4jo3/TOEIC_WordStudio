@@ -13,7 +13,7 @@
 <div class="site">
  <aside class="rail" aria-label="主選單">
   <a href="#dictionary" class="brand" data-nav="dictionary" aria-label="WORDSTUDIO 字典首頁"><span class="brand-monogram">w<span>.</span></span><span class="brand-type">wordstudio<span class="brand-accent">.</span></span></a>
-  <div class="rail-section">YOUR WORKSPACE <span>01 — 02</span></div>
+  <div class="rail-section">YOUR WORKSPACE <span>01 — 04</span></div>
   <nav class="navigation" aria-label="頁面切換">
    <button class="nav-item active" data-nav="dictionary" aria-current="page"><span class="nav-glyph">⌘</span><span>樹狀字典</span><span class="nav-end">↗</span></button>
    <button class="nav-item" data-nav="practice"><span class="nav-glyph">◇</span><span>無限刷題</span><span class="nav-end">↗</span></button>
@@ -24,7 +24,7 @@
   <div class="topline"><span>TOEIC / WORD FAMILY INDEX</span><span class="topline-center">PERSONAL VOCABULARY ARCHIVE</span><span><i class="online-dot" aria-hidden="true"></i> NO ACCOUNT · OFFLINE READY</span></div>
   <section class="page" id="dictionaryPage" aria-labelledby="dictionaryHeading">
    <div class="hero hero-dictionary">
-    <div class="hero-copy"><div class="eyebrow"><span class="eyebrow-line"></span> WORDS ARE CONNECTED</div><h1 id="dictionaryHeading">Every word<br>has a <em>family.</em></h1><p>從母字展開衍生字、片語與介系詞搭配。點選每個字旁邊的☆，就能手動標記／取消「不熟」。</p><div class="hero-stats"><span><b id="allCount">487</b> ENTRIES</span><span><b id="familyCount">—</b> FAMILIES</span><span><b>DAY 01–02</b> SOURCE</span></div></div>
+    <div class="hero-copy"><div class="eyebrow"><span class="eyebrow-line"></span> WORDS ARE CONNECTED</div><h1 id="dictionaryHeading">Every word<br>has a <em>family.</em></h1><p>從母字展開衍生字、片語與介系詞搭配。點選每個字旁邊的☆，就能手動標記／取消「不熟」。</p><div class="hero-stats"><span><b id="allCount">487</b> ENTRIES</span><span><b id="familyCount">—</b> FAMILIES</span><span><b id="dayRangeLabel">DAY 01–04</b> SOURCE</span></div></div>
     <div class="tree-art" aria-hidden="true"><div class="art-top">LEXICON<br>NO. 001</div><div class="art-trunk"></div><span class="art-leaf leaf1">qualify</span><span class="art-leaf leaf2">qualified</span><span class="art-leaf leaf3">qualification</span><span class="art-leaf leaf4">qualifier</span><span class="art-leaf leaf5">be qualified for</span><span class="art-label">FORM ↗ FUNCTION</span></div>
    </div>
    <div class="collection-title"><div><span class="section-overline">01 / THE LEXICON</span><h2>Explore the roots<span class="punct">.</span></h2></div><span class="section-hint">展開字族，點☆標記不熟 <span aria-hidden="true">↘</span></span></div>
@@ -46,12 +46,13 @@
    </div>
    <div class="practice-grid"><section class="quiz-card" id="quizPanel" aria-live="polite" aria-label="練習題目"></section><aside class="scope"><span class="scope-label">CUSTOMIZE THE MIX <span class="punct">✳</span></span><label>DAY / 範圍 <select id="qDay"><option value="all">全部DAY</option></select></label><label>LEVEL / 難度 <select id="qLevel"><option value="all">全部難度</option><option>基礎</option><option>核心</option><option>800</option><option>900</option></select></label><label>TYPE / 類型 <select id="qType"><option value="all">全部類型</option><option>單字</option><option>片語</option><option>搭配／句型</option></select></label><label class="check-filter"><input type="checkbox" id="qUnfamiliar">只練 ★ 不熟</label><div class="scope-bottom"><p id="qPoolCount">依條件隨機出題</p><p>範圍決定考點來源。找不到題目時請放寬條件。</p><button data-action="reset-q">清除篩選 ↗</button></div></aside></div>
    <p class="footnote"><span class="footnote-dot"></span>每題即時顯示答案 · 數字鍵1–6作答 · Enter下一題 · 無作答紀錄或連線需求</p>
-   <footer class="footer"><span>WORDSTUDIO<span class="punct">.</span> / KEEP GOING</span><span>來源：個人TOEIC詞庫 · 非ETS官方試題</span></footer>
+   <footer class="footer"><span>WORDSTUDIO<span class="punct">.</span> / KEEP GOING</span><span>來源：個人TOEIC詞庫及外部詞彙 · 非ETS官方試題</span></footer>
   </section>
  </main>
 </div>
 <dialog id="detailDialog" aria-labelledby="detailTitle"><div id="detailBody" class="detail-body"></div></dialog>
 <script src="./data/words.js"></script>
+<script src="./data/examples.js"></script>
 <script src="./js/preferences.js"></script>
 <script src="./data/families.js"></script>
 <script src="./data/grammar.js"></script>

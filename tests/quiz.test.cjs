@@ -1,14 +1,19 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..'),ctx={window:{},Math,console};
-for(const file of ['data/words.js','data/families.js','data/grammar.js','data/synonyms.js','js/preferences.js','js/engine.js'])vm.runInNewContext(fs.readFileSync(path.join(root,file),'utf8'),ctx,{filename:file});
+for(const file of ['data/words.js','data/examples.js','data/families.js','data/grammar.js','data/synonyms.js','js/preferences.js','js/engine.js'])vm.runInNewContext(fs.readFileSync(path.join(root,file),'utf8'),ctx,{filename:file});
 const {WORDSTUDIO_WORDS:words,WORDSTUDIO_FAMILIES:familyDefs,WORDSTUDIO_GRAMMAR:grammar,WORDSTUDIO_SYNONYMS:synonyms,WordEngine:E}=ctx.window;
 test('詞條與分類符合題庫；保留重複詞性與DAY',()=>{
- assert.equal(words.length,487);assert.equal(words.filter(w=>w.day===1).length,246);assert.equal(words.filter(w=>w.day===2).length,241);
+ assert.ok(words.length>=487);assert.equal(words.filter(w=>w.day===1).length,246);assert.equal(words.filter(w=>w.day===2).length,241);
+ const day3=words.filter(w=>w.day===3),day4=words.filter(w=>w.day===4);
+ if(day3.length||day4.length){assert.ok(day3.length>=80);assert.ok(day4.length>=80);
+ const core3=day3.filter(w=>w.level==='核心');assert.equal(core3[0].en,'accustomed');assert.equal(core3[39].en,'concentrate');
+ assert.equal(day3.filter(w=>w.level==='800').at(-1).en,"throw one's effort into");
+ assert.equal(day3.filter(w=>w.level==='900').at(-1).en,'telecommute');}
  assert.equal(words.filter(w=>w.en==='associate').length,3);
 });
 test('母字分組無遺漏、無重覆、子項都有來源；qualify 類別正確',()=>{
  const groups=E.makeFamilies(words,familyDefs),seen=groups.flatMap(x=>x.entries.map(w=>w.id));
- assert.equal(seen.length,487);assert.equal(new Set(seen).size,487);
+ assert.equal(seen.length,words.length);assert.equal(new Set(seen).size,words.length);
  const found=groups.find(x=>x.head==='qualify');assert.ok(found);
  for(const term of ['qualified','qualification','qualifier','be qualified for','qualification for'])assert.ok(found.entries.some(x=>x.en===term),term);
  assert.ok(found.entries.some(x=>x.en==='be qualified for'&&x.relation==='preps'));
@@ -41,7 +46,7 @@ test('總共4000道隨機題選項唯一、正確答案數正確',()=>{
  }
 });
 test('筛選後未符合的文法與字詞不出題',()=>{
- for(const d of [1,2]){const filt={day:String(d),level:'all',type:'all',unfamiliar:false};for(let j=0;j<200;j++){
+ for(const d of [...new Set(words.map(w=>w.day))]){const filt={day:String(d),level:'all',type:'all',unfamiliar:false};for(let j=0;j<200;j++){
   for(const mode of ['en-zh','zh-en','grammar']){
    const q=mode==='grammar'?E.buildGrammarQ(words,grammar,filt):E.buildWordQ(words,filt,mode);
    if(q)assert.equal(q.answer.day,d);
@@ -71,4 +76,10 @@ test('相同詞條與詞性下的多筆重複資料會一起更新不熟狀態',
  const model=Pref.create(duplicate,null);model.setMarked(found[0],true);
  assert.ok(found.every(x=>x.unfamiliar===true));model.setMarked(found[0],false);
  assert.ok(found.every(x=>x.unfamiliar===false));
+});
+
+test('自編例句語句與中文成對；外部網站例句只保留連結、不重製原文',()=>{
+ const examples=ctx.window.WORDSTUDIO_EXAMPLES;assert.ok(Object.keys(examples).length>=80);
+ for(const [term,sentences] of Object.entries(examples)){assert.equal(sentences.length,2,term);assert.ok(sentences[0].length>20);assert.ok(sentences[1].length>=5);}
+ for(const w of words){if(w.source==='Lingoland'){assert.ok(w.sourceUrl?.startsWith('https://lingolandedu.com/'));assert.ok(!w.example);}}
 });

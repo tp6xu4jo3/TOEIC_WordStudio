@@ -1,0 +1,43 @@
+name: Import verified Lingoland Day 3 and Day 4
+on:
+  push:
+    paths:
+      - scripts/import_lingoland.py
+      - .github/workflows/import-vocabulary.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: import-lingoland
+  cancel-in-progress: false
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install HTML parser
+        run: python -m pip install beautifulsoup4
+      - name: Import and validate all 8 vocabulary sections
+        run: python scripts/import_lingoland.py
+      - name: Verify vocabulary integrity and quiz generation
+        run: node --test tests/quiz.test.cjs
+      - name: Save verified lexicon data to the repository
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/words.js data/source_audit.json
+          if ! git diff --staged --quiet; then
+            git commit -m 'data: add verified Lingoland Day 3–4 vocabulary'
+            git push origin HEAD:main
+          else
+            echo 'Vocabulary source unchanged'
+          fi

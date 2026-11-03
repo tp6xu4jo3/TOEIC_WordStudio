@@ -45,3 +45,10 @@
 - [越南版授權資訊](https://www.studocu.vn/vn/document/truong-dai-hoc-fpt/toeic/hackers-toeic-vocab-doc-thu-5d2934da66264395-bc1ccbdd-88f72bc8/69031996)有明確保留重製權利；公開可讀不能直接等同可以把整份編纂的清單重製到公開Repository。
 
 結論：**未驗證到可安全完整匯入的Day3、Day4資料，這兩天皆未添加**。保留Google Drive來源Day1、Day2全部487筆，沒有拿其他網站的片段補齊、推測中文、編造難度或將外部詞表冒充原題庫。若未來有獲授權、完整的使用者教材或本人的Day3/Day4 Sheet，再依來源匯入並校對。
+
+
+## 2026-11-04：後續Day3、Day4加入策略
+
+在取得`accustomed`、第40個`concentrate`、800最後`throw one's effort into`及900最後`telecommute`四點後，已找到Lingoland的Day3四個分級頁面，以及Day4四個分級頁面。本次依使用者要求以這些**外部頁面詞彙**建立新增Day3、Day4；原本「未匯入」段落是過去版本的歷程，不是現在狀態。來源與處理方式請參閱`data/source_audit.json`。
+
+外部頁面對應的分級、詞義可能與個人教材不一致，故外部字條均含來源連結、不混入原Sheet第1、2天、也不聲稱逐字符合其紙本教材。Lingoland本身提供例句，但英文例句是第三方網站文字，本專案不大量複製；本站自編例句另存`data/examples.js`，其餘有例句的條目保留可查閱來源連結。

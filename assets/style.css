@@ -23,3 +23,13 @@
 .detail-star{padding:13px 17px;background:#fff;border:1px solid #e0e3d9;border-radius:9px;color:#53695c;font-size:12px;font-weight:750;cursor:pointer;white-space:nowrap}
 .detail-star.active{background:#fff0e7;border-color:#ecc6ba;color:#b96551}
 @media(max-width:600px){.detail-familiarity{gap:12px}.detail-star{width:100%}}
+
+/* Original usage examples, with explicit attribution and outbound source links. */
+.detail-example{margin:23px 0;padding:20px 22px;border-radius:13px;border:1px solid #d9e4d8;background:#f1f5ee}
+.example-eyebrow{font-size:10px;font-weight:850;color:#748d7a;letter-spacing:1.2px}
+.detail-example p[lang="en"]{font:400 19px/1.6 var(--serif);margin:15px 0 7px;color:#253b34}
+.detail-example>span{display:block;font-size:12px;line-height:1.9;color:#75857c}
+.detail-example .source-example{font:600 11px/1.7 var(--sans);margin:13px 0 0}
+.detail-example a{color:#357361;text-decoration:underline;text-underline-offset:4px}
+.detail-example .example-placeholder{font:400 12px/1.9 var(--sans);color:#657b6f;margin:11px 0}
+@media(max-width:600px){.detail-example{padding:16px}.detail-example p[lang="en"]{font-size:17px}}

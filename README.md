@@ -67,7 +67,7 @@ wordstudio-github/
 
 ## Day 03、Day 04來源查核
 
-2026-11-04已檢查Studocu、Quizlet等公開資料，發現可辨識的主題詞及部分卡片集合，但**無法核定同本專案DAY 1–2格式、涵蓋核心／基礎／800／900全部詞條的完整清單**，因此依要求不匯入Day3或Day4，題庫維持487筆。查核來源及限制見`DATA_NOTES.md`。
+2026-11-04已檢查Studocu、Quizlet等公開資料，發現可辨識的主題詞及部分卡片集合，但**無法核定同本專案DAY 1–2格式、涵蓋核心／基礎／800／900全部詞條的完整清單**，因此依要求不匯入Day3或Day4，題庫維持487筆（原Google Sheet Day1/2）。查核來源及限制見`DATA_NOTES.md`。
 
 ## 題庫新增或修改後的更新方式
 
@@ -98,3 +98,14 @@ node --test tests/quiz.test.cjs
 - 原始詞條來自個人題庫；公開GitHub Repository及Pages前，請自行確認資料公開與使用權限。
 - 字族分類是學習導航，同一母字下的子字**不代表意思相同或能互換**。
 - 詞庫目前為2026-09-16的Drive內容快照；靜態網站不會自動同步新的雲端修改。
+
+
+## Day3、Day4：Lingoland詞彙與例句來源
+
+- `scripts/import_lingoland.py`依Lingoland公開的Day3、Day4四個分級清單擷取**英文詞條、精簡中文詞義與詞性**；不覆寫原Google Sheet的Day1、Day2。新來源的等級標示對應：Basic1→核心、Basic2→基礎、800→800、900→900，這是網站分類映射，不代表新資料已經與個人實體教材逐字核對。
+- 四個Day3指紋必須符合：第一個`accustomed`、第40個`concentrate`、800末尾`throw one's effort into`、900末尾`telecommute`。任一不符即停止匯入。
+- Lingoland的英文**例句不直接複製到本站**：`data/examples.js`收錄獨立自編且附中文解釋的職場例句；其餘有來源例句的詞條，在詳細資料中提供連結。這樣可保留例句查閱功能而不大量轉載第三方著作。
+- 語意歧義仍須人工校對。新增Day3、Day4不會同步回Google Sheet；不熟標記仍由目前瀏覽器儲存。
+- 匯入工具需在有網路連線的環境執行，並先安裝`beautifulsoup4`：`pip install beautifulsoup4`。
+
+來源入口：[Day3](https://lingolandedu.com/zh-tw/vocabulary/toeic-vocabularies/hacker-toeic-vocabulary/day-03-office-mastery)、[Day4](https://lingolandedu.com/zh-tw/vocabulary/toeic-vocabularies/hacker-toeic-vocabulary/day-04-business-secrets)。
